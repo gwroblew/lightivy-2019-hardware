@@ -1,0 +1,250 @@
+#template R0603 R R_0603_1608Metric
+#template C0603 C C_0603_1608Metric
+#template C3528 C CP_EIA-3528-21_Kemet-B
+#template RARR R_Pack04 R_Array_Convex_4x0603
+#template LED0805 LED LED_0805_2012Metric
+#template BUTTON SW_DIP_x01 SOFT_BUTTON_6x6mm
+#template BUTTONTH SW_DIP_x01 SW_PUSH_6mm_h5mm
+#template ESP8266_MOD ESP-12F ESP-12F
+#template MICROSD Micro_SD_Card_Det MicroSD_TFP-09-2-12B
+#template L3030 Electromagnetic_Actor L_Taiyo-Yuden_MD-3030
+#template PSRAM VTI7064MSME SOIC-8_3.9x4.9mm_P1.27mm
+
+#template C C0603
+#template C35 C3528
+#template R R0603
+
+#template _R R
+[1] - GND
+#template ^R R
+[1] - ^
+#template ^RARR RARR
+[1] - ^
+[2] - ^
+[3] - ^
+[4] - ^
+
+#template _C C
+[1] - GND
+#template _C35 C35
+[1] - GND
+#template _Cp C(100nF)
+[1] - GND
+#template _Cs C(22uF)
+[1] - GND
+
+#template _BUTTON BUTTON
+[1] - GND
+
+#template _BUTTONTH BUTTONTH
+[1] - GND
+
+//================================================================================
+
+#template main
+
+VBAT - 
+GND _ -
+^ - 
+
+#part JP1A Conn_01x01 PinHeader_1x01_P2.54mm_Vertical
+  Pin_1 BAT+ - 
+#part JP1B Conn_01x01 PinHeader_1x01_P2.54mm_Vertical
+  Pin_1 - _
+
+#part JP2 Conn_01x06 PinHeader_1x06_P2.54mm_Vertical
+  Pin_1 - ^
+  Pin_2 - _
+  Pin_3 - :U1:ESP_RX
+  Pin_4 - :U1:ESP_TX
+  Pin_5 - :U1:RST
+  Pin_6 - :U1:GPIO0
+
+#part U5 DMS2085LSD
+[1] A - [2]
+[5] D - [6]
+[7] K - [8]
+K - 
+A - :USB1:VBUS
+D - VBAT
+[3] S - 
+[4] G = _R(1M), :USB1:VBUS
+
+#part U3 SY8008B
+[1] EN - IN
+[2] GND - _
+[3] LX - :L1:[1] - ^
+[4] IN = :U5:K, :U5:S, _C32(220uF), _Cs
+[5] FB = ^R(453k), _R(100k), ^C(22pF)
+
+#part L1 L3030(2.2uH)
+[2] = _C32(220uF), _Cs, _Cp
+
+#part USB1 USB_B_Micro USB-MICRO-B-FCI-10118192
+VBUS - 
+D- - 
+D+ - 
+ID - 
+GND - _
+Shield - _
+
+#part R100 R(2k)
+[1] - :USB1:VBUS
+
+#part U4 XT2052
+[1] NC - 
+[2] ISET - _R(2k)
+[3] GND - _
+[4] VIN - :USB1:VBUS
+[5] VBAT = :JP1A:BAT+, _Cs
+[6] DONE - LED0805(GREEN) - R100
+[7] CHRG - LED0805(RED) - R100
+[8] NC - 
+[9] - _
+
+#part SW1 * MSK12C02
+[3] - :JP1A:BAT+
+[2] - VBAT
+
+#part RA3 RARR(10k)
+R1.1 - ^
+R2.1 - _
+R3.1 - ^
+R4.1 - ^
+#part RA4 RARR(10k)
+R1.1 - _
+R2.1 - ^
+R3.1 - ^
+R4.1 - ^
+
+#part U1 ESP8266_MOD
+[1] RST = :RA3:R1.2, _C(1uF)
+[2] ADC = :RA3:R2.2, R(30k) - :JP1A:BAT+
+[3] EN - :RA3:R3.2
+[4] GPIO16 LCD_CS BUTTONS_LOAD - 
+[5] GPIO14 HSPI_CLK LCD_CLK SD_CLK RAM_CLK - 
+[6] GPIO12 HSPI_MISO SD_MISO RAM_MISO - :RA3:R4.2
+[7] GPIO13 HSPI_MOSI LCD_DATA SD_MOSI RAM_MOSI - 
+[8] VCC = ^, _C35(220uF), _Cp
+[9] GND - _
+[10] GPIO15 HSPI_CS I2SO_BCK - :RA4:R1.2
+[11] GPIO2 I2SO_WS - :RA4:R2.2
+[12] GPIO0 LCD_RS BUTTON8 SD_POWER - :RA4:R3.2
+[13] GPIO4 RAM_CS - 
+[14] GPIO5 BUTTONS_DATA - 
+[15] RXD ESP_RX I2SO_DATA - 
+[16] TXD ESP_TX SD_CS BUTTONS_CLK - :RA4:R4.2
+[17] CS0 - 
+[18] MISO - 
+[19] GPIO9 - 
+[20] GPIO10 - 
+[21] MOSI - 
+[22] SCLK - 
+
+#part RAM PSRAM
+[1] NCE - :U1:RAM_CS
+[2] SIO1 - :U1:RAM_MISO
+[3] SIO2 - 
+[4] GND - _
+[5] SIO0 - :U1:RAM_MOSI
+[6] SCLK - :U1:RAM_CLK
+[7] SIO3 - 
+[8] VDD = ^, _Cp
+
+#part DAC PT8211-S
+[1] BCK - :U1:I2SO_BCK
+[2] WS - :U1:I2SO_WS
+[3] DIN - :U1:I2SO_DATA
+[4] GND - _
+[5] VDD = _Cs, _Cp, ^R(10)
+[6] LCH - RCH
+[7] NC - 
+[8] RCH - 
+
+#part AMP FM8002A
+[1] SHUTDOWN - _
+[2] BYPASS = INP, _C(1uF)
+[3] INP - 
+[4] INM = R(30k) - VO1, R(20k) = _C(100nF), C(100nF) - :DAC:RCH
+[5] VO1 - 
+[6] VDD = ^, _C35(220uF), _Cp
+[7] GND - _
+[8] VO2 - 
+
+#part SPK Speaker Speaker_7417Q
+[1] - :AMP:VO1
+[2] - :AMP:VO2
+
+#part MicroSD MICROSD
+[2] CS - :U1:SD_CS
+[3] MOSI - :U1:SD_MOSI
+[4] 3V3 = ^, _Cs(22uF), _Cp
+[5] SCLK - :U1:SD_CLK
+[6] GND - _
+[7] MISO - :U1:SD_MISO
+[12] GND - _
+
+#part RA1 ^RARR(10k)
+#part RA2 ^RARR(10k)
+
+#part B0 _BUTTON
+[2] = :RA1:[5], :U2:BUTTON0
+#part B1 _BUTTON
+[2] = :RA1:[8], :U2:BUTTON1
+#part B2 _BUTTON
+[2] = :RA1:[6], :U2:BUTTON2
+#part B3 _BUTTON
+[2] = :RA1:[7], :U2:BUTTON3
+#part B4 _BUTTON
+[2] = :RA2:[6], :U2:BUTTON4
+#part B5 _BUTTON
+[2] = :RA2:[7], :U2:BUTTON5
+#part B6 _BUTTON
+[2] = :RA2:[8], :U2:BUTTON6
+#part B7 _BUTTON
+[2] = :RA2:[5], :U2:BUTTON7
+#part B8 _BUTTONTH
+[2] - :U1:BUTTON8
+
+#part U2 74HC165 SOIC-16_3.9x9.9mm_P1.27mm
+[1] SHIFT - :U1:BUTTONS_LOAD
+[2] CLOCK - :U1:BUTTONS_CLK
+[3] E BUTTON0 - 
+[4] F BUTTON1 - 
+[5] G BUTTON2 - 
+[6] H BUTTON3 - 
+[7] NQH - 
+[8] GND - _
+[9] QH - :U1:BUTTONS_DATA
+[10] SA - _
+[11] A BUTTON4 - 
+[12] B BUTTON5 - 
+[13] C BUTTON6 - 
+[14] D BUTTON7 - 
+[15] CLOCKINH - _
+[16] VCC = ^, _Cp
+
+#part LCD LCD_TFT177F254
+[1] NC - 
+[2] GND - _
+[3] K - _
+[4] A - ^R(18)
+[5] GND - _
+[6] NRESET = ^R(10k), _C(1uF)
+[7] RS - :U1:LCD_RS
+[8] SDA - :U1:LCD_DATA
+[9] SCK - :U1:LCD_CLK
+[10] VCC = ^, _Cs(22uF)
+[11] IOVCC - ^
+[12] CS - :U1:LCD_CS
+[13] GND - _
+[14] NC - 
+
+#part F1 * Fiducial_1mm_Dia_2mm
+#part F2 * Fiducial_1mm_Dia_2mm
+#part F3 * Fiducial_1mm_Dia_2mm
+
+#part H1 * MountingHole_2.2mm_M2_ISO7380_Pad
+#part H2 * MountingHole_2.2mm_M2_ISO7380_Pad
+#part H3 * MountingHole_2.2mm_M2_ISO7380_Pad
+#part H4 * MountingHole_2.2mm_M2_ISO7380_Pad

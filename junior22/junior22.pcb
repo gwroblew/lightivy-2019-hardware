@@ -1,0 +1,193 @@
+#template BUTTON SW_DIP_x01 SW_PUSH_6mm_h5mm
+#template ESP8266_MOD ESP-12F ESP-12F
+#template L3030 Electromagnetic_Actor L_Axial_L9.5mm_D4.0mm_P12.70mm_Horizontal_Fastron_SMCC
+#template PSRAM VTI7064MSME SOIC-8_3.9x4.9mm_P1.27mm
+
+#template R R R_Axial_DIN0204_L3.6mm_D1.6mm_P5.08mm_Horizontal
+#template RARR R_Network04 R_Array_SIP5
+
+#template _R R
+[1] - GND
+#template ^R R
+[1] - ^
+
+#template C100nF C C_Disc_D3.0mm_W1.6mm_P2.50mm
+#template C1uF C C_Disc_D3.0mm_W1.6mm_P2.50mm
+#template C10uF C CP_Radial_D4.0mm_P1.50mm
+#template C22uF C CP_Radial_D4.0mm_P1.50mm
+#template C100uF C CP_Radial_D6.3mm_P2.50mm
+#template C220uF C CP_Radial_D6.3mm_P2.50mm
+
+#template _Cp C100nF(100nF)
+[1] - GND
+#template _Cs C22uF(22uF)
+[2] - GND
+#template _C1uF C1uF(1uF)
+[1] - GND
+#template _C100uF C100uF(100uF)
+[2] - GND
+#template _C220uF C220uF(220uF)
+[2] - GND
+
+#template _BUTTON BUTTON
+[1] - GND
+
+//================================================================================
+
+#template main
+
+VBAT - 
+GND _ -
+^ - 
+
+#part JP1A Conn_01x01 PinHeader_1x01_P2.54mm_Vertical
+  Pin_1 BAT+ - 
+#part JP1B Conn_01x01 PinHeader_1x01_P2.54mm_Vertical
+  Pin_1 - _
+
+#part JP2 Conn_01x06 PinHeader_1x06_P2.54mm_Vertical
+  Pin_1 - ^
+  Pin_2 - _
+  Pin_3 - :U1:ESP_RX
+  Pin_4 - :U1:ESP_TX
+  Pin_5 - :U1:RST
+  Pin_6 - :U1:GPIO0
+
+#part U3 QX2304LXXE SOT-89-3
+[1] GND - _
+[2] VOUT = ^, _C220uF, _Cs, _Cp
+[3] LX -
+
+#part L1 L3030(10uH)
+[1] - :U3:LX
+[2] = VBAT, _Cs
+
+#part SW1 * SK12D07VG3
+[3] - :JP1A:BAT+
+[2] - VBAT
+
+#part U1 ESP8266_MOD
+[1] RST = ^R(10k), _C1uF
+[2] ADC = _R(10k), R(30k) - :JP1A:BAT+
+[3] EN - ^R(10k)
+[4] GPIO16 LCD_CS BUTTONS_LOAD - 
+[5] GPIO14 HSPI_CLK LCD_CLK SD_CLK RAM_CLK - 
+[6] GPIO12 HSPI_MISO SD_MISO RAM_MISO - 
+[7] GPIO13 HSPI_MOSI LCD_DATA SD_MOSI RAM_MOSI - 
+[8] VCC = ^, _C220uF, _Cp
+[9] GND - _
+[10] GPIO15 HSPI_CS I2SO_BCK - _R(10k)
+[11] GPIO2 I2SO_WS - ^R(10k)
+[12] GPIO0 LCD_RS BUTTON8 - ^R(10k)
+[13] GPIO4 RAM_CS - 
+[14] GPIO5 BUTTONS_DATA - 
+[15] RXD ESP_RX I2SO_DATA - 
+[16] TXD ESP_TX SD_CS BUTTONS_CLK - 
+[17] CS0 - 
+[18] MISO - 
+[19] GPIO9 - 
+[20] GPIO10 - 
+[21] MOSI - 
+[22] SCLK - 
+
+#part RAM PSRAM
+[1] NCE - :U1:RAM_CS
+[2] SIO1 - :U1:RAM_MISO
+[3] SIO2 - 
+[4] GND - _
+[5] SIO0 - :U1:RAM_MOSI
+[6] SCLK - :U1:RAM_CLK
+[7] SIO3 - 
+[8] VDD = ^, _Cp
+
+#part DAC PT8211-S
+[1] BCK - :U1:I2SO_BCK
+[2] WS - :U1:I2SO_WS
+[3] DIN - :U1:I2SO_DATA
+[4] GND - _
+[5] VDD = _Cs, _Cp, ^R(10)
+[6] LCH - RCH
+[7] NC - 
+[8] RCH - 
+
+// TDA2822L
+#part AMP * DIP-8_W7.62mm
+[1] OUTPUT1 - C100nF - _R(4.7)
+[2] VCC = ^, _C220uF, _Cp
+[3] OUTPUT2 - C100nF - _R(4.7)
+[4] GND - _
+[5] NP2 - _C(10nF)
+[6] INPUT2 - _
+[7] INPUT1 = _R(10k), _Cp, C100nF - :DAC:RCH
+[8] NP1 - C10uF - NP2
+
+#part SPK Speaker Speaker_7417Q
+[1] - :AMP:OUTPUT1
+[2] - :AMP:OUTPUT2
+
+#part MicroSD Conn_01x04 PinHeader_1x04_P2.54mm_Vertical
+[1] CS - :U1:SD_CS
+[2] MOSI - :U1:SD_MOSI
+[3] MISO - :U1:SD_MISO
+[4] SCLK - :U1:SD_CLK
+
+#part RA1 RARR
+common - ^
+#part RA2 RARR
+common - ^
+
+#part B0 _BUTTON
+[2] = :RA1:R1, :U2:BUTTON0
+#part B1 _BUTTON
+[2] = :RA1:R4, :U2:BUTTON1
+#part B2 _BUTTON
+[2] = :RA1:R2, :U2:BUTTON2
+#part B3 _BUTTON
+[2] = :RA1:R3, :U2:BUTTON3
+#part B4 _BUTTON
+[2] = :RA2:R2, :U2:BUTTON4
+#part B5 _BUTTON
+[2] = :RA2:R3, :U2:BUTTON5
+#part B6 _BUTTON
+[2] = :RA2:R4, :U2:BUTTON6
+#part B7 _BUTTON
+[2] = :RA2:R1, :U2:BUTTON7
+#part B8 _BUTTON
+[2] - :U1:BUTTON8
+
+#part U2 74HC165 DIP-16_W7.62mm
+[1] SHIFT - :U1:BUTTONS_LOAD
+[2] CLOCK - :U1:BUTTONS_CLK
+[3] E BUTTON0 - 
+[4] F BUTTON1 - 
+[5] G BUTTON2 - 
+[6] H BUTTON3 - 
+[7] NQH - 
+[8] GND - _
+[9] QH - :U1:BUTTONS_DATA
+[10] SA - _
+[11] A BUTTON4 - 
+[12] B BUTTON5 - 
+[13] C BUTTON6 - 
+[14] D BUTTON7 - 
+[15] CLOCKINH - _
+[16] VCC = ^, _Cp
+
+#part LCD Conn_01x08 PinHeader_1x08_P2.54mm_Vertical
+[1] VCC = ^, _Cs
+[2] GND - _
+[3] CS - :U1:LCD_CS
+[4] RESET = ^R(10k), _C1uF
+[5] A0 - :U1:LCD_RS
+[6] SDA - :U1:LCD_DATA
+[7] SCK - :U1:LCD_CLK
+[8] LED - ^R(18)
+
+#part F1 * Fiducial_1mm_Dia_2mm
+#part F2 * Fiducial_1mm_Dia_2mm
+#part F3 * Fiducial_1mm_Dia_2mm
+
+#part H1 * MountingHole_2.2mm_M2_ISO7380_Pad
+#part H2 * MountingHole_2.2mm_M2_ISO7380_Pad
+#part H3 * MountingHole_2.2mm_M2_ISO7380_Pad
+#part H4 * MountingHole_2.2mm_M2_ISO7380_Pad
